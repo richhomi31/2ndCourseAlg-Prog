@@ -1,0 +1,378 @@
+/*==========1 Задача==========*/
+
+import java.util.Arrays;
+import java.util.Scanner;
+
+class Prog_1 {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Введите числа массива в одну строку (четное количество): ");
+        String line = sc.nextLine();
+        String[] strArr = line.split("\\s+");
+        if (strArr.length % 2 != 0) {
+            System.out.println("Ошибка: нечетное количество чисел массива.");
+        } else {
+            int[] intArr = new int[strArr.length];
+            int[] intArr_copy = new int[strArr.length];
+
+            int i;
+            for(i = 0; i < strArr.length; ++i) {
+                boolean isValid = false;
+                String currentElement = strArr[i];
+
+                while(!isValid) {
+                    try {
+                        int num = Integer.parseInt(currentElement.trim());
+                        intArr[i] = num;
+                        intArr_copy[i] = num;
+                        isValid = true;
+                    } catch (NumberFormatException var10) {
+                        System.out.println("Ошибка: " + currentElement + " (i = " + i + ") не является целым числом");
+                        System.err.print("Введите корректную замену элементу №" + i + ": ");
+                        currentElement = sc.nextLine();
+                    }
+                }
+            }
+
+            sc.close();
+            System.out.println("Введенный массив: " + Arrays.toString(intArr));
+
+            for(i = 1; i < intArr.length - 1; ++i) {
+                if (intArr[i] < intArr[i - 1] && intArr[i] < intArr[i + 1]) {
+                    intArr_copy[i] = (int)Math.pow(intArr[i], 2.0);
+                }
+            }
+
+            System.out.println("Получившийся массив: " + Arrays.toString(intArr_copy));
+        }
+
+    }
+}
+
+/*==========2 Задача==========*/
+
+import java.text.DecimalFormat;
+import java.util.Scanner;
+
+class Dot {
+    private double r;
+    private double fi;
+    private static DecimalFormat df = new DecimalFormat("0.0");
+
+    public void init(double r, double fi) {
+        this.r = r;
+        this.fi = fi;
+    }
+
+    public void read() {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Введите радиус r: ");
+        this.r = sc.nextDouble();
+
+        System.out.print("Введите угол fi (в градусах): ");
+        fi = sc.nextDouble() % 360;
+        this.fi = fi < 0 ? fi + 360 : fi;
+
+    }
+
+    public void display() {
+        System.out.println("R = " + df.format(r) + ", Fi = " + df.format(Math.toRadians(fi)));
+    }
+
+    public static Dot add(Dot dot1, Dot dot2) {
+        double x1 = dot1.getR() * Math.cos(Math.toRadians(dot1.getFi()));
+        double y1 = dot1.getR() * Math.sin(Math.toRadians(dot1.getFi()));
+
+        double x2 = dot2.getR() * Math.cos(Math.toRadians(dot2.getFi()));
+        double y2 = dot2.getR() * Math.sin(Math.toRadians(dot2.getFi()));
+
+        double xSum = x1 + x2;
+        double ySum = y1 + y2;
+
+        double rSum = Math.sqrt(xSum * xSum + ySum * ySum);
+        double fiRad = Math.atan2(ySum, xSum);
+        double fiSum = Math.toDegrees(fiRad < 0 ? fiRad + 2 * Math.PI : fiRad);
+
+        Dot dotSum = new Dot();
+        dotSum.init(rSum, fiSum);
+        return dotSum;
+    }
+
+    public double getR() {
+        return r;
+    }
+
+    public double getFi() {
+        return fi;
+    }
+
+    public void setR(double r) {
+        this.r = r;
+    }
+
+    public void setFi(double fi) {
+        this.fi = fi;
+    }
+
+    public double distance_to_ox() {
+        return r * Math.sin(Math.toRadians(fi));
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Демонстрация работы с объектами
+        Dot dot1 = new Dot();
+        Dot dot2 = new Dot();
+
+        System.out.println("--Ввод точки 1--");
+        dot1.read();
+
+        System.out.println("--Ввод точки 2--");
+        dot2.read();
+
+        System.out.println("--Вывод точек--");
+        System.out.print("Точка 1: ");
+        dot1.display();
+        System.out.print("Точка 2: ");
+        dot2.display();
+
+        System.out.println("--Расстояния до Ox--");
+        System.out.println("Расстояние от точки 1 до Ox: " + df.format(Math.abs(dot1.distance_to_ox())));
+        System.out.println("Расстояние от точки 2 до Ox: " + df.format(Math.abs(dot2.distance_to_ox())));
+
+        System.out.println("--Сложение точек--");
+        Dot sum = Dot.add(dot1, dot2);
+        System.out.print("Сумма точек: ");
+        sum.display();
+
+        System.out.println("--Работа сеттеров--");
+        dot1.setR(10.0);
+        dot1.setFi(45.0);
+        System.out.print("Точка 1 после изменения: ");
+        dot1.display();
+
+        sc.close();
+    }
+}
+
+/*==========3 Задача==========*/
+
+import java.util.*;
+
+class Workplace {
+    private double salary;
+    private double k; // Коэффициент квалификации
+
+    public void init(double salary, double k) {
+        this.salary = salary;
+        this.k = k;
+    }
+
+    public void read(Scanner sc) {
+        System.out.print("З/п = ");
+        this.salary = sc.nextDouble();
+
+        System.out.print("k = ");
+        this.k = sc.nextDouble();
+    }
+
+    public String display() {
+        return "З/п = " + salary + ", k = " + k;
+    }
+
+    public double paycheck() {
+        return salary * k;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public double getK() {
+        return k;
+    }
+}
+
+class Employer {
+    private String name;
+    private Workplace Workplace_1;
+    private Workplace Workplace_2;
+    private Workplace Workplace_3;
+    private int numWorkplace_1;
+    private int numWorkplace_2;
+    private int numWorkplace_3;
+
+    public void init(String name, Workplace Workplace_1, Workplace Workplace_2,
+                     Workplace Workplace_3, int numWorkplace_1, int numWorkplace_2, int numWorkplace_3) {
+        this.name = name;
+        this.Workplace_1 = Workplace_1;
+        this.Workplace_2 = Workplace_2;
+        this.Workplace_3 = Workplace_3;
+        this.numWorkplace_1 = numWorkplace_1;
+        this.numWorkplace_2 = numWorkplace_2;
+        this.numWorkplace_3 = numWorkplace_3;
+    }
+
+    public void read(Scanner sc) {
+        this.Workplace_1 = new Workplace();
+        this.Workplace_2 = new Workplace();
+        this.Workplace_3 = new Workplace();
+
+        System.out.println("Введите имя объекта: ");
+        this.name = sc.nextLine();
+
+        System.out.println("\nПараметры рабочего места №1: ");
+        this.Workplace_1.read(sc);
+        System.out.print("Введите количество занятых рабочих мест №1: ");
+        this.numWorkplace_1 = sc.nextInt();
+
+        System.out.println("\nПараметры рабочего места №2:");
+        this.Workplace_2.read(sc);
+        System.out.print("Введите количество занятых рабочих мест №2: ");
+        this.numWorkplace_2 = sc.nextInt();
+
+        System.out.println("\nПараметры рабочего места №3: ");
+        this.Workplace_3.read(sc);
+        System.out.print("Введите количество занятых рабочих мест №3: ");
+        this.numWorkplace_3 = sc.nextInt();
+    }
+
+    public void display() {
+        System.out.println("Название организации: " + name);
+        System.out.println("\nРабочее место №1: " + Workplace_1.display() + "\nКоличество занятых рабочих мест №1: " + numWorkplace_1);
+        System.out.println("\nРабочее место №2: " + Workplace_2.display() + "\nКоличество занятых рабочих мест №2: " + numWorkplace_2);
+        System.out.println("\nРабочее место №3: " + Workplace_3.display() + "\nКоличество занятых рабочих мест №3: " + numWorkplace_3);
+
+    }
+    // метод вычисления выплат всем работникам
+    public double totalPaycheck() {
+        return Workplace_1.paycheck() * numWorkplace_1 + Workplace_2.paycheck() *
+                numWorkplace_2 + Workplace_3.paycheck() * numWorkplace_3;
+    }
+    // метод вычисления наиболее убыточной должности
+    public Workplace mostExpensivePos() {
+        double cost1 = Workplace_1.paycheck() * numWorkplace_1;
+        double cost2 = Workplace_2.paycheck() * numWorkplace_2;
+        double cost3 = Workplace_3.paycheck() * numWorkplace_3;
+
+        if ((cost1 >= cost2) && (cost1 >= cost3)) return Workplace_1;
+        if ((cost2 >= cost1) && (cost2 >= cost3)) return Workplace_2;
+        return Workplace_3;
+    }
+}
+
+class Prog_3 {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        Employer emp = new Employer();
+        System.out.println("Ввод данных работодателя:");
+        emp.read(sc);
+        System.out.println("\nИнформация о работодателе:");
+        emp.display();
+        System.out.println("\nСтатистика организации:");
+        System.out.println("Сумма выплат зарплат = " + emp.totalPaycheck() + "$");
+        System.out.println("Наиболее убыточная должность: " + emp.mostExpensivePos().display());
+        sc.close();
+    }
+}
+
+/*==========4 Задача==========*/
+
+import java.text.DecimalFormat;
+import java.util.Scanner;
+
+// поля можно указать подобно аргументам методов
+public record Dot_record(double r, double fi) {
+    private static final DecimalFormat DF = new DecimalFormat("0.0");
+
+    public Dot_record {
+        if (r < 0) {
+            throw new IllegalArgumentException("Радиус не может быть отрицательным");
+        }
+
+        fi = fi % 360 < 0 ? fi % 360 + 360 : fi;
+    }
+
+    public static Dot_record read(Scanner sc) {
+        System.out.print("Введите радиус r: ");
+        double radius = sc.nextDouble();
+
+        System.out.print("Введите угол fi (в градусах): ");
+        double angle = sc.nextDouble();
+
+        return new Dot_record(radius, angle);
+    }
+
+    // вместо сетеров методы с возвращением новых объектов
+    public Dot_record withR(double newR) {
+        return new Dot_record(newR, this.fi);
+    }
+
+    public Dot_record withFi(double newFi) {
+        return new Dot_record(this.r, newFi);
+    }
+
+    public void display() {
+        System.out.println("R = " + DF.format(r) + ", Fi = " + DF.format(Math.toRadians(fi)));
+    }
+
+    public static Dot_record add(Dot_record Dot_record1, Dot_record Dot_record2) {
+        double x1 = Dot_record1.r() * Math.cos(Math.toRadians(Dot_record1.fi()));
+        double y1 = Dot_record1.r() * Math.sin(Math.toRadians(Dot_record1.fi()));
+
+        double x2 = Dot_record2.r() * Math.cos(Math.toRadians(Dot_record2.fi()));
+        double y2 = Dot_record2.r() * Math.sin(Math.toRadians(Dot_record2.fi()));
+
+        double xSum = x1 + x2;
+        double ySum = y1 + y2;
+
+        double rSum = Math.sqrt(xSum * xSum + ySum * ySum);
+        double fiRad = Math.atan2(ySum, xSum);
+        double fiSum = Math.toDegrees(fiRad < 0 ? fiRad + 2 * Math.PI : fiRad);
+
+        return new Dot_record(rSum, fiSum);
+    }
+
+    public double distance_to_ox() {
+        return r * Math.sin(Math.toRadians(fi));
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("--Ввод точки 1--");
+        Dot_record Dot_record1 = Dot_record.read(sc);
+
+        System.out.println("--Ввод точки 2--");
+        Dot_record Dot_record2 = Dot_record.read(sc);
+
+        System.out.println("--Вывод точек--");
+        System.out.print("Точка 1: ");
+        Dot_record1.display();
+        System.out.print("Точка 2: ");
+        Dot_record2.display();
+
+        System.out.println("--Расстояния до Ox--");
+        System.out.println("Расстояние от точки 1 до Ox: " + DF.format(Math.abs(Dot_record1.distance_to_ox())));
+        System.out.println("Расстояние от точки 2 до Ox: " + DF.format(Math.abs(Dot_record2.distance_to_ox())));
+
+        System.out.println("--Сложение точек--");
+        Dot_record sum = Dot_record.add(Dot_record1, Dot_record2);
+        System.out.print("Сумма точек: ");
+        sum.display();
+
+        System.out.println("--Демонстрация сеттеров--");
+        Dot_record modifiedDot_record1 = Dot_record1.withR(10.0).withFi(45.0);
+        System.out.print("Точка 1 после (не)изменения: ");
+        modifiedDot_record1.display();
+
+        // точка один не изменилась - поля статичны
+        System.out.print("Оригинальная точка 1: ");
+        Dot_record1.display();
+
+        sc.close();
+    }
+}
+
