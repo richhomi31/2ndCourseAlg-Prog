@@ -1,0 +1,225 @@
+import java.text.DecimalFormat;
+import java.util.*;
+
+public class LR2 {
+    public static final DecimalFormat df = new DecimalFormat("0.00");
+    public static void main(String[] args) {
+        int[] arraySmall = new int[1000];
+        int[] arrayMedium = new int[10000];
+        int[] arrayBig = new int[100000];
+
+        fill_array(arraySmall); fill_array(arrayMedium); fill_array(arrayBig);
+        benchmark(arraySmall); benchmark(arrayMedium);
+
+    }
+    // Сортировка пузырьком
+    public static void bubbleSort(int[] arr) {
+        int[] cpy = Arrays.copyOf(arr, arr.length);
+        for (int i = 0; i < cpy.length - 1; i++) {
+            for (int j = 0; j < cpy.length - 1; j++) {
+                if (cpy[j] > cpy[j + 1]) {
+                    int bufer = cpy[j];
+                    cpy[j] = cpy[j + 1]; // замена элемента
+                    cpy[j + 1] = bufer;
+                }
+            }
+        }
+    }
+    // Сортировка расческой
+    // Та же самая сортировка пузырьком, но с опорным элементом
+    public static void hairBrushSort(int[] arr) {
+        int gap = arr.length;
+        int[] cpy = Arrays.copyOf(arr, gap);
+
+        while (gap > 1) {
+            gap = gap * 10 / 13; // gap / 1.3
+
+            for (int i = 0; i + gap < cpy.length; i++) {
+                if (cpy[i] > cpy[i + gap]) {
+                    int temp = cpy[i];
+                    cpy[i] = cpy[i + gap]; // замена элемента
+                    cpy[i + gap] = temp;
+                }
+            }
+        }
+    }
+    // Быстрая сортировка
+    public static void quicksort(int[] arr) {
+        int[] cpy = Arrays.copyOf(arr, arr.length);
+        qsort(cpy, 0, cpy.length - 1);
+    }
+    // рекурсивный метод
+    public static void qsort(int[] arr, int left, int right) {
+        if (left >= right) { return; } // В массиве хотя бы два элемента
+        int pivot = arr[(left + right) / 2];
+        int i = left, j = right;
+        // i движется направо и ищет элементы больше чем Pivot
+        // j движется налево и ищет элементы меньше чем Pivot
+        // т.е. i & j движутся навстречу друг другу и ищут пары для обмена
+        // если пара найдена, то меняются
+        while (i <= j) {
+            while (arr[i] < pivot) i++;
+            while (arr[j] > pivot) j--;
+
+            if (i <= j) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+                i++;
+                j--;
+            }
+        }
+        qsort(arr, left, j);
+        qsort(arr, i, right);
+    }
+    // Частичная сортировка массива
+    public static void partialsort(int[] arr, int percent) {
+        int original[] = arr.clone();
+        int howManyToKeep = arr.length * percent / 100;
+
+        qsort(arr, 0, arr.length - 1);
+
+        for (int i = howManyToKeep; i < arr.length; i++) {
+            arr[i] = original[i];
+        }
+    }
+
+    public static void reverse(int[] arr) {
+        quicksort(arr);
+        for (int i = 0; i < arr.length / 2; i++) {
+            int temp = arr[i];
+            arr[i] = arr[arr.length - 1 - i];
+            arr[arr.length - 1 - i] = temp;
+        }
+    }
+
+    public static void duplicate_fill(int[] arr, int percent) {
+        int value = arr[0];
+        int bound = arr.length * percent / 100;
+        for (int i = 1; i < bound; i++) {
+            arr[i] = value;
+        }
+    }
+
+    // Заполнение массива случайными элементами от 0 до 10000
+    public static void fill_array(int[] arr) {
+        Random rand = new Random();
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = rand.nextInt(1000);
+        }
+    }
+
+    public static double test_sort(int type_of_sort, int[] arr, int partialsort_percent, int duplicate_percent, boolean rev) {
+        int[] cpy = Arrays.copyOf(arr, arr.length);
+        if (rev) {reverse(cpy);} else {partialsort(cpy, partialsort_percent); duplicate_fill(cpy, duplicate_percent);}
+        long start = System.nanoTime();
+        for (int i = 0; i < 5; i++) {
+            switch (type_of_sort) {
+            case 1:
+                bubbleSort(cpy);
+            case 2:
+                hairBrushSort(cpy);
+            case 3:
+                quicksort(cpy);
+            }
+        }
+        long end = System.nanoTime();
+        return (double) (end - start) / 1_000_000.00;
+    }
+
+    public static void benchmark(int[] arr) {
+        double bsTime1, bsTime2, bsTime3, bsTime4, bsTime5,
+        combTime1, combTime2, combTime3, combTime4, combTime5,
+        quickTime1, quickTime2, quickTime3, quickTime4, quickTime5;
+
+        double bsTimeTotal = 0;
+        double combTimeTotal = 0;
+        double quickTimeTotal = 0; 
+
+        System.out.println("____Проверка сортировок на массиве из " +
+                arr.length + " элементов____\n");
+
+        System.out.println("Неотсортированный массив:");
+        bsTime1 = test_sort(1, arr, 0, 0, false);
+        bsTimeTotal += bsTime1;
+        System.out.println("Сортировка пузырьком: " + df.format(bsTime1) + " мс");
+        combTime1 = test_sort(2, arr, 0, 0, false);
+        combTimeTotal += combTime1;
+        System.out.println("Сортировка расчёской: " + df.format(combTime1) + " мс");
+        quickTime1 = test_sort(3, arr, 0, 0, false);
+        quickTimeTotal += quickTime1;
+        System.out.println("Быстрая сортировка: " + df.format(quickTime1) + " мс");
+        System.out.print("\n");
+        
+        System.out.println("Частично отсортированный массив (75%):");
+        bsTime2 = test_sort(1, arr, 75, 0, false);
+        bsTimeTotal += bsTime2;
+        System.out.println("Сортировка пузырьком: " + df.format(bsTime2) + " мс");
+        combTime2 = test_sort(2, arr, 75, 0, false);
+        combTimeTotal += combTime2;
+        System.out.println("Сортировка расчёской: " + df.format(combTime2) + " мс");
+        quickTime2 = test_sort(3, arr, 75, 0, false);
+        quickTimeTotal += quickTime2;
+        System.out.println("Быстрая сортировка: " + df.format(quickTime2) + " мс");
+        System.out.print("\n");
+
+        System.out.println("Обратно отсортированный массив:");
+        bsTime3 = test_sort(1, arr, 0, 0, true);
+        bsTimeTotal += bsTime3;
+        System.out.println("Сортировка пузырьком: " + df.format(bsTime3) + " мс");
+        combTime3 = test_sort(2, arr, 0, 0, true);
+        combTimeTotal += combTime3;
+        System.out.println("Сортировка расчёской: " + df.format(combTime3) + " мс");
+        quickTime3 = test_sort(3, arr, 0, 0, true);
+        quickTimeTotal += quickTime3;
+        System.out.println("Быстрая сортировка: " + df.format(quickTime3) + " мс");
+        System.out.print("\n");
+        
+        System.out.println("Массив с множеством дубликатов (10% уникальных элементов):");
+        bsTime4 = test_sort(1, arr, 0, 90, false);
+        bsTimeTotal += bsTime4;
+        System.out.println("Сортировка пузырьком: " + df.format(bsTime4) + " мс");
+        combTime4 = test_sort(2, arr, 0, 90, false);
+        combTimeTotal += combTime4;
+        System.out.println("Сортировка расчёской: " + df.format(combTime4) + " мс");
+        quickTime4 = test_sort(3, arr, 0, 90, false);
+        quickTimeTotal += quickTime4;
+        System.out.println("Быстрая сортировка: " + df.format(quickTime4) + " мс");
+        System.out.print("\n");
+        
+        System.out.println("Почти отсортированный массив (10% уникальных элементов):");
+        bsTime5 = test_sort(1, arr, 90, 0, false);
+        bsTimeTotal += bsTime5;
+        System.out.println("Сортировка пузырьком: " + df.format(bsTime5) + " мс");
+        combTime5 = test_sort(2, arr, 90, 0, false);
+        combTimeTotal += combTime5;
+        System.out.println("Сортировка расчёской: " + df.format(combTime5) + " мс");
+        quickTime5 = test_sort(3, arr, 90, 0, false);
+        quickTimeTotal += quickTime5;
+        System.out.println("Быстрая сортировка: " + df.format(quickTime5) + " мс");
+        System.out.print("\n");
+
+        analyseResults(arr.length, bsTimeTotal/5, combTimeTotal/5, quickTimeTotal/5);
+    }
+
+    public static void analyseResults(int length, double bs_value, double cs_value, double qs_value) {
+        System.out.println("____Анализ результатов тестирования для массива из " 
+        + length + " элементов____");
+
+        System.out.println("\nСредние показатели алгоритмов: ");
+        System.out.println("Пузырьковая: " + df.format(bs_value) + " мс\nРасчёска: " + df.format(cs_value) + " мс\nБыстрая: " + df.format(qs_value) + " мс\n");
+        double min = Math.min(Math.min(bs_value, cs_value), qs_value);
+        String fastest = "";
+        
+        if (min == bs_value) {fastest = "Пузырьковая";}
+        else if (min == cs_value) {fastest = "Расчёской";}
+        else {fastest = "Быстрая";}
+
+        System.out.println("Наиболее быстрый алгоритм: " + fastest + " (" + df.format(min) + " мс)");
+        System.out.println("\nОтносительная скорость:");
+        System.out.printf("Расчёска / Пузырьковая: быстрее в %.2f раз %n", bs_value / cs_value);
+        System.out.printf("Быстрая / Пузырьковая: быстрее в %.2f раз %n", bs_value / qs_value);
+        System.out.printf("Быстрая / Расческа: быстрее в %.2f раз %n", cs_value / qs_value);
+        System.out.println("");  
+    }
+}
