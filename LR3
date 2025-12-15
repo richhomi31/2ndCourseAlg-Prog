@@ -1,0 +1,663 @@
+// ОДНОСВЯЗНЫЙ СПИСОК
+public class singlyLinkedList {
+    private Node head;
+    private int size;
+
+    private static class Node {
+        int number;
+        Node next;
+
+        void init(int num) {
+            this.number = num;
+            this.next = null;
+        }
+
+        int getValue() { return this.number; }
+        Node getNext() { return this.next; }
+        void setNext(Node newNext) { this.next = newNext;}
+    }
+
+    void init() {
+        this.head = null;
+        this.size = 0;
+    }
+
+    void display() {
+        System.out.print("[");
+        Node currNode = head;
+        while (currNode != null) {
+            System.out.print(currNode.getValue());
+            if (currNode.getNext() != null) {
+                System.out.print(", ");
+            }
+            currNode = currNode.getNext();
+        }
+        System.out.println("]");
+    }
+
+    // добавление элемента в начало списка
+    void addFirst(int data) {
+        Node newNode = new Node();
+        newNode.init(data);
+        size++;
+
+        newNode.setNext(head);
+        head = newNode;
+    }
+
+    // добавление элемента в конец списка
+    void addLast(int data) {
+        Node newNode = new Node();
+        newNode.init(data);
+
+        // если список пуст
+        if (head == null) {
+            head = newNode;
+            size++;
+            return;
+        }
+
+        Node currNode = head;
+        while (currNode.getNext() != null) {
+            currNode = currNode.getNext();
+        }
+        currNode.setNext(newNode);
+        size++;
+    }
+
+    // удаление первого
+    void removeFirst() {
+        // если в списке 0 или есть 1 элемент
+        if (size < 2) {
+            head = null;
+            size = 0;
+            return;
+        }
+
+        head = head.getNext();
+        size--;
+    }
+
+    // удаление последнего
+    void removeLast() {
+        // если в списке 0 или есть 1 элемент
+        if (size < 2) {
+            head = null;
+            size = 0;
+            return;
+        }
+
+        Node currNode = head;
+
+        while (currNode.getNext().getNext() != null) {
+            currNode = currNode.getNext();
+        }
+
+        currNode.setNext(null);
+        size--;
+    }
+
+    // удаление по значению
+    void remove(int data) {
+        if (size == 0) return;
+
+        if (data == head.getValue()) {
+            head = head.getNext();
+            size--;
+            return;
+        }
+
+        Node currNode = head;
+
+        while (currNode.getNext() != null) {
+            if (data == currNode.getNext().getValue()) {
+                currNode.setNext(currNode.getNext().getNext());
+                size--;
+                return;
+            }
+            currNode = currNode.getNext();
+        }
+    }
+
+    // проверка наличия по значению
+    boolean contains(int data) {
+        if (head == null) return false;
+        Node currNode = head;
+        while (currNode != null) {
+            if (data == currNode.getValue()) {
+                return true;
+            }
+            currNode = currNode.getNext();
+        }
+        return false;
+    }
+
+    int size() { return size; }
+
+    // проверка на пустоту списка
+    boolean isEmpty() { return head == null; }
+
+    // очистка списка
+    void clear() {
+        head = null;
+        size = 0;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// ДВУСВЯЗНЫЙ СПИСОК
+
+public class doublyLinkedList {
+    private Node head;
+    private Node tail;
+    private int size;
+
+    private static class Node {
+        int number;
+        Node next;
+        Node prev;
+
+        void init(int number) {
+            this.number = number;
+            this.next = null;
+            this.prev = null;
+        }
+
+        int getValue() { return this.number; }
+        Node getNext() { return this.next; }
+        Node getPrev() { return this.prev; }
+        void setNext(Node next) { this.next = next; }
+        void setPrev(Node prev) { this.prev = prev; }
+    }
+
+    void init() {
+        this.head = null;
+        this.tail = null;
+        this.size = 0;
+    }
+
+    void display() {
+        System.out.print("[");
+        Node currNode = head;
+        for (int i = 0; i < size; i++) {
+            System.out.print(currNode.getValue());
+            if (currNode.getNext() != null) {
+                System.out.print(", ");
+            }
+            currNode = currNode.getNext();
+        }
+        System.out.println("]");
+    }
+
+    void displayReverse() {
+        System.out.print("[");
+        Node currNode = tail;
+        for (int i = size; i > 0; i--) {
+            System.out.print(currNode.getValue());
+            if (currNode.getPrev() != null) {
+                System.out.print(", ");
+            }
+            currNode = currNode.getPrev();
+        }
+        System.out.println("]");
+    }
+
+
+    void addFirst(int data) {
+        Node newNode = new Node();
+        newNode.init(data);
+
+        newNode.setNext(head);
+        if (size != 0) head.setPrev(newNode);
+        head = newNode;
+
+        if (size == 0) tail = newNode;
+        size++;
+    }
+
+    void addLast(int data) {
+        Node newNode = new Node();
+        newNode.init(data);
+
+        newNode.setPrev(tail);
+        if (size != 0) tail.setNext(newNode);
+        tail = newNode;
+
+        if (size == 0) head = newNode;
+        size++;
+    }
+
+    void removeFirst() {
+        if (size < 2) {
+            head = tail = null;
+            size = 0;
+            return;
+        }
+
+        head = head.getNext();
+        head.setPrev(null);
+        size--;
+    }
+
+    void removeLast() {
+        if (size < 2) {
+            tail = head = null;
+            size = 0;
+            return;
+        }
+
+        tail = tail.getPrev();
+        tail.setNext(null);
+
+        size--;
+    }
+
+    void remove(int data) {
+        if (this.isEmpty()) { return; }
+
+        if (data == head.getValue()) {
+            head = head.getNext();
+            head.setPrev(null);
+            size--;
+            return;
+        }
+
+        if (data == tail.getValue()) {
+            tail = tail.getPrev();
+            tail.setNext(null);
+            size--;
+            return;
+        }
+
+        Node currNode = head;
+        for (int i = 0; i < size; i++) {
+            if (currNode.getNext().getValue() == data) {
+                currNode.setNext(currNode.getNext().getNext());
+                currNode.getNext().setPrev(currNode);
+                size--;
+                return;
+            }
+            currNode = currNode.getNext();
+        }
+    }
+
+    boolean contains(int data) {
+        if (this.isEmpty()) { return false; }
+        Node currNode = head;
+        for (int i = 0; i < size; i++) {
+            if (data == currNode.getValue()) {
+                return true;
+            }
+            currNode = currNode.getNext();
+        }
+        return false;
+    }
+
+    int size() { return size; }
+
+    boolean isEmpty() { return head == null; }
+
+    void clear() {
+        head = null;
+        size = 0;
+    }
+
+    void add(int index, int data) {
+        Node newNode = new Node();
+        newNode.init(data);
+
+        if (size == 0) {
+            this.addFirst(data);
+            head = tail = newNode;
+            size++;
+            return;
+        }
+
+        if (index == 0) {
+            this.addFirst(data);
+            return;
+        }
+
+        if (index >= size - 1) {
+            this.addLast(data);
+            return;
+        }
+
+        Node currNode = head;
+        for (int i = 0; i != index - 1; i++) {
+            currNode = currNode.getNext();
+        }
+
+        currNode.getNext().setPrev(newNode);
+        newNode.setNext(currNode.getNext());
+        currNode.setNext(newNode);
+        newNode.setPrev(currNode);
+        size++;
+    }
+
+    Node get(int index) {
+        if (size == 0) return null;
+
+        Node currNode = head;
+        for (int i = 0; i < index; i++) {
+            if (currNode.getNext() != null) {
+                currNode = currNode.getNext();
+            }
+        }
+        return currNode;
+    }
+
+    Node getFirst() { return head; }
+  
+    Node getLast() { return tail; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// Циклический список
+public class circularLinkedList {
+    private Node tail;
+    private int size;
+
+    private static class Node {
+        int data;
+        Node next;
+
+        void init(int data) {
+            this.data = data;
+            this.next = null;
+        }
+
+        int getValue() { return data; }
+        Node getNext() { return next; }
+        void setNext(Node next) { this.next = next; }
+
+    }
+
+    public circularLinkedList() {
+        this.tail = null;
+        this.size = 0;
+    }
+
+    void display() {
+        System.out.print("[");
+        Node temp = tail.getNext();
+        for (int i = 0; i < size; i++) {
+            System.out.print(temp.getValue());
+            if (i != size - 1) {
+                System.out.print(", ");
+            }
+            temp = temp.getNext();
+        }
+        System.out.println("]");
+    }
+
+    void addFirst(int data) {
+        Node newNode = new Node();
+        newNode.init(data);
+        if (tail == null) {
+            tail = newNode;
+            tail.setNext(tail);
+        } else {
+            newNode.setNext(tail.getNext());
+            tail.setNext(newNode);
+        }
+        size++;
+    }
+
+    void addLast(int data) {
+        addFirst(data);
+        tail = tail.getNext();
+    }
+
+    void removeFirst() {
+        if (size < 2) {
+            tail = null;
+            size = 0;
+        } else {
+            tail.setNext(tail.getNext().getNext());
+            size--;
+        }
+    }
+
+    void removeLast() {
+        if (size < 2) {
+            tail = null;
+            size = 0;
+            return;
+        }
+
+        Node temp = tail.getNext();
+
+        while (temp.getNext() != tail) {
+            temp = temp.getNext();
+        }
+        temp.setNext(tail.getNext());
+        tail = temp;
+        size--;
+    }
+
+    void remove(int data) {
+        if (tail == null) return;
+        Node temp = tail;
+        for (int i = 0; i < size; i++) {
+            if (temp.getNext().getValue() == data) {
+                size--;
+                if (size == 0) {
+                    tail = null;
+                    return;
+                }
+                if (temp.getNext() == tail) {
+                    temp.setNext(tail.getNext());
+                    tail = temp;
+                    return;
+                }
+                temp.setNext(temp.getNext().getNext());
+                return;
+            }
+            temp = temp.getNext();
+        }
+    }
+
+    boolean contains(int data) {
+        if (tail == null) {
+            return false;
+        } else {
+            Node temp = tail.getNext();
+            for (int i = 0; i < size; i++) {
+                if (temp.getValue() == data) {
+                    return true;
+                }
+                temp = temp.getNext();
+            }
+        }
+        return false;
+    }
+
+    int size() { return size; }
+
+    boolean isEmpty() { return size == 0; }
+
+    void clear() {
+        tail = null;
+        size = 0;
+    }
+
+    void rotate() {
+        if (tail != null) {
+            tail = tail.next;
+        }
+    }
+
+    boolean findCycle() {
+        if (tail == null) {
+            return true;
+        } else {
+            Node temp = tail;
+            while (true) {
+                temp = temp.getNext();
+                if (temp == tail) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    circularLinkedList[] splitIntoTwo() {
+
+        circularLinkedList[] split = new circularLinkedList[2];
+        split[0] = new circularLinkedList();
+        split[1] = new circularLinkedList();
+
+        if (size < 2) {
+            return split;
+        } else {
+            int middle = size / 2;
+            Node temp = tail.getNext();
+
+            for (int i = 0; i < middle; i++) {
+                split[0].addLast(temp.getValue());
+                temp = temp.getNext();
+            }
+
+            for (int i = middle; i < size; i++) {
+                split[1].addLast(temp.getValue());
+                temp = temp.getNext();
+            }
+        }
+        return split;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// main метод с тестом всех типов списков
+
+public class Main
+{
+    public static void main(String[] args)
+    {
+        System.out.println("===Односвязный лист===");
+
+        singlyLinkedList sll = new singlyLinkedList();
+        sll.init();
+        sll.addFirst(3); sll.addFirst(5);
+        sll.addFirst(4); sll.addFirst(7);
+        sll.addLast(19); sll.addLast(15);
+        sll.addLast(2); sll.addLast(14);
+
+        sll.display();
+        System.out.println("Размер: " + sll.size());
+        sll.removeFirst();
+        sll.removeLast();
+        sll.display();
+        sll.remove(3);
+        sll.display();
+        System.out.println("Размер: " + sll.size());
+        System.out.println("Проверка наличия элемента 2: " + sll.contains(2));
+        System.out.println("Проверка наличия элемента 100: " + sll.contains(100));
+        System.out.println("Проверка на пустоту списка: " + sll.isEmpty());
+        System.out.println("Очистка списка...");
+        sll.clear();
+        System.out.println("Проверка на пустоту списка: " + sll.isEmpty());
+        sll.display();
+        System.out.println("Размер: " + sll.size());
+
+        System.out.println("===Двусвязный лист===");
+
+        doublyLinkedList dll = new doublyLinkedList();
+        dll.init();
+        dll.addFirst(3); dll.addFirst(5);
+        dll.addFirst(4); dll.addFirst(7);
+        dll.addLast(19); dll.addLast(15);
+        dll.addLast(2); dll.addLast(14);
+
+        dll.add(10, 100);
+        dll.display();
+        dll.displayReverse();
+        System.out.println("Размер: " + dll.size());
+        dll.removeFirst();
+        dll.removeLast();
+        dll.display();
+        dll.remove(3);
+        dll.add(2, 10);
+        dll.display();
+        System.out.println("Получение узла по индексу 2: " + dll.get(2));
+        System.out.println("Размер: " + dll.size());
+        System.out.println("Проверка на наличие элемента со значением 200: " + dll.contains(200));
+        System.out.println("Проверка на наличие элемента со значением 2: " + dll.contains(2));
+        System.out.println("Проверка на пустоту списка: " + dll.isEmpty());
+        System.out.println("Очистка списка...");
+        dll.clear();
+        System.out.println("Проверка на пустоту списка: " + dll.isEmpty());
+        dll.display();
+        System.out.println("Размер: " + dll.size());
+
+        System.out.println("===Циклический список===");
+
+        circularLinkedList cll = new circularLinkedList();
+        cll.addFirst(3); cll.addFirst(5);
+        cll.addFirst(4); cll.addFirst(7);
+        cll.addLast(19); cll.addLast(15);
+        cll.addLast(2); cll.addLast(14);
+        cll.display();
+        cll.removeFirst();
+        cll.removeLast();
+        cll.display();
+        cll.remove(19);
+        cll.display();
+
+        System.out.println("Есть 19?: " + cll.contains(19));
+        System.out.println("Есть 15?: " + cll.contains(15));
+        System.out.println("Размер: " + cll.size());
+        System.out.println("Пустой ли: " + cll.isEmpty());
+
+        cll.rotate();
+        cll.display();
+
+        System.out.println("Есть ли цикл: " + cll.findCycle());
+
+        System.out.println("Демонстрация сплита пополам: ");
+        circularLinkedList[] halves = cll.splitIntoTwo();
+
+        System.out.print("Текущий вид списка: ");
+        cll.display();
+
+        System.out.print("Часть первая: ");
+        halves[0].display();
+        System.out.println("Есть ли цикл в первой части?: " + halves[0].findCycle());
+
+        System.out.print("Часть вторая: ");
+        halves[1].display();
+        System.out.println("Есть ли цикл во второй части?: " + halves[1].findCycle());
+    }
+}
+
