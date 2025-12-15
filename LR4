@@ -1,0 +1,310 @@
+import java.util.Arrays;
+
+// БИНАРНОЕ ДЕРЕВО
+public class BinaryTree {
+    private Node root;
+
+    static class Node {
+        int data;
+        Node left;
+        Node right;
+
+        public Node(int data) {
+            this.data = data;
+            left = null;
+            right = null;
+        }
+
+        public Node getLeft() {
+            return left;
+        }
+
+        public void setLeft(int data) {
+            left = new Node(data);
+        }
+
+        public Node getRight() {
+            return right;
+        }
+
+        public void setRight(int data) {
+            right = new Node(data);
+        }
+    }
+
+    Node getRoot() {
+        return root;
+    }
+
+    void setRoot(int data) {
+        root = new Node(data);
+    }
+
+    void preOrder(Node root) {
+        if (root == null) return;
+        System.out.print(root.data + " ");
+        preOrder(root.left);
+        preOrder(root.right);
+    }
+
+    void inOrder(Node root) {
+        if (root == null) return;
+        inOrder(root.left);
+        System.out.print(root.data + " ");
+        inOrder(root.right);
+    }
+
+    void postOrder(Node root) {
+        if (root == null) return;
+        postOrder(root.left);
+        postOrder(root.right);
+        System.out.print(root.data + " ");
+    }
+    // уровневый порядок
+    void levelOrder(Node root) {
+        // проходит очередь по принципу послдений зашел первый вышел
+        if (root == null) return;
+        java.util.Queue<Node> queue = new java.util.LinkedList<>();
+        // сперва в очередь добавляется корень
+        queue.add(root);
+
+        while (!queue.isEmpty()) {
+            // Корень вытаскивается и выписывается и добавляются его дети
+            // затем рекурсия с его детьми, т.е. Дети добавляются в конец очереди,
+            // чтобы идти слева направо
+            Node node = queue.poll();
+            System.out.print(node.data + " ");
+            if (node.left != null) queue.add(node.left);
+            if (node.right != null) queue.add(node.right);
+        }
+    }
+    // проверка количества уровней дерева
+    // рекурсия от 1, пока не достигнет нуля
+    int height(Node root) {
+        if (root == null) return 0;
+        return 1 + Math.max(height(root.left), height(root.right));
+    }
+    // проверка полноты дерева
+    boolean isFull(Node root) {
+        if (root == null) return true;
+        // если детей нет, то возврат true
+        if (root.left == null && root.right == null) return true;
+        // если оба ребенка имеются, то рекурсия по детям
+        if (root.left != null && root.right != null) {
+            return isFull(root.left) && isFull(root.right);
+        }
+        // иначе ложь
+        return false;
+    }
+
+    // Бинарное дерево поиска
+    void bstInsert(int data) {
+        if (root == null) {
+            root = new Node(data);
+            return;
+        }
+        // если в дереве есть корень, то
+        // начинается поиск свободного места
+        // сначала левая сторона потом правая
+        // в зависимости от значения элемента
+        Node current = root;
+        while (true) {
+            if (data < current.data) {
+                if (current.left == null) {
+                    current.left = new Node(data);
+                    return;
+                }
+                current = current.left;
+            } else {
+                if (current.right == null) {
+                    current.right = new Node(data);
+                    return;
+                }
+                current = current.right;
+            }
+        }
+    }
+    // Построение сбалансированного дерева из сорт-массива
+    void buildBalanced(int[] arr) {
+        if (arr == null || arr.length == 0) {
+            root = null;  // очищаем дерево
+            return;
+        }
+        // ссылка на корень тк это и есть центральный эл массива
+        root = buildBalanced(arr, 0, arr.length - 1);
+    }
+
+    private Node buildBalanced(int[] arr, int start, int end) {
+        // проверка длины в том числе для подмассивов
+        if (start > end) return null;
+        // берется центральный узел и устанавливается корневым
+        // затем по нему делится массив и рекурсия по обоим от него сторонам
+        int mid = (start + end) / 2;
+        Node node = new Node(arr[mid]);
+        node.left = buildBalanced(arr, start, mid - 1);
+        node.right = buildBalanced(arr, mid + 1, end);
+        return node;
+    }
+
+    // уровневые операции
+    void levelInsert(int data) {
+        if (root == null) { // Если список пустой, то элемент делается головным
+            root = new Node(data);
+            return;
+        }
+        // создание очереди для уровневого прохождения дерева
+        java.util.Queue<Node> queue = new java.util.LinkedList<>();
+        queue.add(root);
+
+        // берём первый элемент из очереди и проверяем,
+        // можно ли вставить ребёнка слева, затем справа,
+        // если нет, то добавляем рассматриваемый узел в конец очереди
+        while (!queue.isEmpty()) {
+            Node node = queue.poll();
+            // проверка слева
+            if (node.left == null) {
+                node.left = new Node(data);
+                return;
+            } else {
+                queue.add(node.left);
+            }
+            // проверка справа
+            if (node.right == null) {
+                node.right = new Node(data);
+                return;
+            } else {
+                queue.add(node.right);
+            }
+        }
+    }
+
+    void levelDelete(int key) {
+        if (root == null) return;
+
+        // Если в дереве только корень
+        if (root.left == null && root.right == null) {
+            if (root.data == key) root = null;
+            return;
+        }
+
+        Node keyNode = null;  // узел для удаления
+        Node last = null;     // самый нижний правый узел
+
+        // обход в ширину через очередь ищем:
+        // узел с key и последний узел в дереве
+        java.util.Queue<Node> q = new java.util.LinkedList<>();
+        q.add(root);
+
+        while (!q.isEmpty()) {
+            last = q.poll();
+            // если нужное значение найдено то
+            // откладываем в keynode
+            if (last.data == key) keyNode = last;
+
+            // рекурсия по детям
+            if (last.left != null) q.add(last.left);
+            if (last.right != null) q.add(last.right);
+        }
+
+        // если найден узел для удаления, то значение последнего
+        // копируется в него
+        if (keyNode != null) {
+            keyNode.data = last.data;
+
+            // удаление повторения нижнего
+            // правого узла из своей позиции
+            deleteDeepest(last);
+        }
+    }
+
+    private void deleteDeepest(Node delNode) {
+        // Тот же проход по уровням
+        java.util.Queue<Node> queue = new java.util.LinkedList<>();
+        queue.add(root);
+
+        while (!queue.isEmpty()) {
+            Node current = queue.poll();
+
+            // не нужно делать лишних замен, т.к.
+            // самый нижний правый узел всегда
+            // будет бездетный
+            if (current.left != null) {
+                if (current.left == delNode) {
+                    current.left = null;
+                    return;
+                }
+                queue.add(current.left);
+            }
+
+            if (current.right != null) {
+                if (current.right == delNode) {
+                    current.right = null;
+                    return;
+                }
+                queue.add(current.right);
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+// main метод для теста класса BinaryTree
+
+public class Main {
+    public static void main(String[] args) {
+        BinaryTree tree = new BinaryTree();
+        tree.setRoot(10);                               //         10
+        tree.getRoot().setLeft(5);                      //      5     15
+        tree.getRoot().setRight(15);                    //     3 20  7  16
+        tree.getRoot().getLeft().setRight(20);          //          4 9
+        tree.getRoot().getRight().setLeft(7);           // Неполное дерево
+        tree.getRoot().getRight().setRight(16);
+        tree.getRoot().getRight().getLeft().setLeft(4);
+        tree.getRoot().getRight().getLeft().setRight(9);
+        System.out.println("Полное ли дерево: " + tree.isFull(tree.getRoot()));
+        tree.getRoot().getLeft().setLeft(3); // Полное дерево
+        System.out.println("Полное ли дерево: " + tree.isFull(tree.getRoot()));
+
+        tree.preOrder(tree.getRoot());
+        System.out.println();
+        tree.inOrder(tree.getRoot());
+        System.out.println();
+        tree.postOrder(tree.getRoot());
+        System.out.println();
+        tree.levelOrder(tree.getRoot());
+        System.out.println();
+
+        System.out.println("Поиска");
+        BinaryTree tree2 = new BinaryTree();
+        tree2.bstInsert(4);
+        tree2.bstInsert(3);
+        tree2.bstInsert(5);
+        tree.preOrder(tree2.getRoot());
+        System.out.println();
+
+        System.out.println("Сбалансированное");
+        int[] sortedArr = {10, 20, 30, 50, 60, 70, 80};
+        BinaryTree tree3 = new BinaryTree();
+        tree3.buildBalanced(sortedArr);
+        tree3.levelOrder(tree3.getRoot());
+        System.out.println();
+
+        BinaryTree tree4 = new BinaryTree();
+        tree4.levelInsert(10); tree4.levelInsert(80);
+        tree4.levelInsert(3); tree4.levelInsert(34);
+        tree4.levelInsert(2); tree4.levelInsert(19);
+        tree4.levelOrder(tree4.getRoot());
+        System.out.println();
+        tree4.levelDelete(10);
+        tree4.levelOrder(tree4.getRoot());
+        System.out.println();
+
+
+    }
+}
+
